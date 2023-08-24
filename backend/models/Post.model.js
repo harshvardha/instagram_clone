@@ -12,7 +12,8 @@ const postSchema = new Schema({
         required: true
     },
     caption: {
-        type: String
+        type: String,
+        default: ""
     },
     likes: [
         {
