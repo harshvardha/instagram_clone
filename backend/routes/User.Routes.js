@@ -42,7 +42,7 @@ userRouter.put(
 userRouter.delete("/deleteAccount", verifyAccessToken, deleteUser);
 
 // route for getting user by id
-userRouter.get("/user/:userId", getUserById);
+userRouter.get("/:userId", getUserById);
 
 // route for getting users by name
 userRouter.get("/search", getUsers);

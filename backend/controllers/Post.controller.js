@@ -1,4 +1,5 @@
 const Post = require("../models/Post.model");
+const User = require("../models/User.model");
 const CustomError = require("../errors/CustomError");
 const { StatusCodes } = require("http-status-codes");
 const { validationResult } = require("express-validator");
@@ -15,8 +16,8 @@ const postCreatePost = async (req, res, next) => {
             url,
             user: userId,
             caption
-        }, { new: true });
-        res.status(StatusCodes.CREATED).json(newPost);
+        });
+        res.status(StatusCodes.CREATED).json({ newPost });
     } catch (error) {
         console.log(error);
         next(error);
@@ -69,12 +70,14 @@ const deletePost = async (req, res, next) => {
 const putLikeOrDislikePost = async (req, res, next) => {
     try {
         const postId = req.params.postId;
-        const { userId } = req.body;
+        const userId = req.userId;
+        console.log(userId);
         const post = await Post.findById(postId);
         if (!post) {
             throw new CustomError(StatusCodes.NOT_FOUND, "Please provide correct post id.");
         }
         if (post.likes.includes(userId)) {
+            console.log("hello");
             await post.updateOne({
                 $pull: { likes: userId }
             });
@@ -121,11 +124,29 @@ const getAllPosts = async (req, res, next) => {
     }
 }
 
+const getTimelinePosts = async (req, res, next) => {
+    try {
+        const userId = req.userId;
+        const user = await User.findById(userId);
+        const userPosts = await Post.find({ user: userId }).populate("user");
+        const friendsPost = await Promise.all(
+            user.following.map((friendId) => {
+                return Post.find({ user: friendId }).populate("user");
+            })
+        );
+        res.status(StatusCodes.OK).json(userPosts.concat(...friendsPost));
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+
 module.exports = {
     postCreatePost,
     putUpdatePost,
     deletePost,
     putLikeOrDislikePost,
     getPostById,
-    getAllPosts
+    getAllPosts,
+    getTimelinePosts
 }

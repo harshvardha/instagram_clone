@@ -8,6 +8,8 @@ require("dotenv").config();
 const connectDB = require("./config/dbConnect");
 const authRoutes = require("./routes/Authentication.Routes");
 const userRoutes = require("./routes/User.Routes");
+const postRoutes = require("./routes/Post.Routes");
+const commentRoutes = require("./routes/Comment.Routes");
 const PORT = process.env.PORT || 5000;
 
 connectDB();
@@ -23,6 +25,8 @@ app.use(cors({
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/post", postRoutes);
+app.use("/comment", commentRoutes);
 
 app.use((error, req, res, next) => {
     const status = error.status || 500;
