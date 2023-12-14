@@ -15,8 +15,7 @@ authRouter.post(
         check("name").notEmpty(),
         check("email").normalizeEmail().isEmail(),
         check("password").isLength({ min: 6 }),
-        check("username").isLength({ min: 3, max: 30 }),
-        check("dob").isString()
+        check("username").isLength({ min: 3, max: 30 })
     ],
     postRegisterNewUser
 );
