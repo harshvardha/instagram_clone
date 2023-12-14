@@ -13,7 +13,7 @@ const postRegisterNewUser = async (req, res, next) => {
         if (!errors.isEmpty()) {
             throw new CustomError(StatusCodes.NOT_ACCEPTABLE, "Please provide correct details.");
         }
-        const { name, email, password, username, dob } = req.body;
+        const { name, email, password, username } = req.body;
         const userExist = await User.findOne({ email: email });
         if (userExist) {
             throw new CustomError(StatusCodes.CONFLICT, "User already exist.");
@@ -23,8 +23,7 @@ const postRegisterNewUser = async (req, res, next) => {
             name,
             email,
             password: hashedPassword,
-            username,
-            dob
+            username
         });
         res.status(StatusCodes.CREATED).json(newUser);
     } catch (error) {
@@ -55,7 +54,7 @@ const postLoginUser = async (req, res, next) => {
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "10m" }
         );
-        res.status(StatusCodes.OK).json({ userExist, accessToken });
+        res.status(StatusCodes.OK).json({ accessToken });
     } catch (error) {
         console.log(error);
         next(error);
