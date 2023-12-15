@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
     SettingsOutlined,
     GridOnOutlined,
@@ -23,7 +24,7 @@ const Profile = () => {
                         <div className="details--username">
                             <p>harshvardhan28_04</p>
                             <div className="buttons">
-                                <button type="button" id="editProfileButton">Edit Profile</button>
+                                <Link to={"/editProfile"}><button type="button" id="editProfileButton">Edit Profile</button></Link>
                                 <button type="button" id="settingButton"><SettingsOutlined /></button>
                             </div>
                         </div>
