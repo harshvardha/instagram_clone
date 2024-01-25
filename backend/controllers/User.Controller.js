@@ -15,17 +15,19 @@ const putEditProfile = async (req, res, next) => {
         }
         const userId = req.userId;
         console.log(userId);
-        const { name, username, profilePictureUrl, gender } = req.body;
+        const { name, username, profilePictureUrl, gender, bio } = req.body;
         const user = await User.findById(userId);
         if (!user) {
             throw new CustomError(StatusCodes.NOT_FOUND, "User does not exist.");
         }
         if (gender === "MALE" || gender === "FEMALE") {
+            console.log("gender: ", gender);
             const updatedUser = await user.updateOne({
                 name,
                 username,
                 profilePictureUrl,
-                gender
+                gender,
+                bio: bio ? bio : ""
             }, { new: true });
             res.status(StatusCodes.OK).json(updatedUser);
         }

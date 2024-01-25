@@ -81,3 +81,14 @@
     font-size: 1rem;
     margin: auto;
 }
+
+.profilePic {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+}
+
+#newProfilePic {
+    width: 6rem;
+    border-radius: 50%;
+}
