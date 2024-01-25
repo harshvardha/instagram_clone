@@ -22,7 +22,7 @@ const Login = () => {
             }
             const response = await authenticationApiRequests.login(loginDetails);
             if (response.status === 200) {
-                console.log(response.data);
+                localStorage.setItem("accessToken", response.data.accessToken);
                 navigateTo("/profile");
             }
         } catch (error) {
