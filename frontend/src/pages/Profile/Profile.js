@@ -13,6 +13,7 @@ import "./Profile.css";
 
 const Profile = () => {
     const [isContent, setIsContent] = useState(false);
+    const [isUser, setIsUser] = useState(true);
 
     return (
         <div className="profile">
@@ -23,10 +24,18 @@ const Profile = () => {
                     <div className="profile--page--about--details">
                         <div className="details--username">
                             <p>harshvardhan28_04</p>
-                            <div className="buttons">
-                                <Link to={"/editProfile"}><button type="button" id="editProfileButton">Edit Profile</button></Link>
-                                <button type="button" id="settingButton"><SettingsOutlined /></button>
-                            </div>
+                            {
+                                isUser ? (
+                                    <div className="buttons">
+                                        <Link to={"/editProfile"}><button type="button" id="editProfileButton">Edit Profile</button></Link>
+                                        <button type="button" id="settingButton"><SettingsOutlined /></button>
+                                    </div>
+                                ) : (
+                                    <div className="buttons">
+                                        <button type="button" id="followUnfollowButton">follow</button>
+                                    </div>
+                                )
+                            }
                         </div>
                         <div className="details--metrics">
                             <p>0 posts</p>
