@@ -6,6 +6,7 @@ import {
     MenuOutlined
 } from "@mui/icons-material";
 import profilePic from "../../images/profile_pic.jpg";
+import { Link } from "react-router-dom";
 import "./Sidebar.css";
 
 const Sidebar = () => {
@@ -15,10 +16,10 @@ const Sidebar = () => {
                 <Instagram />
             </div>
             <div className="sidebar--options">
-                <HomeOutlined />
+                <Link to={"/Timeline"} style={{ textDecoration: "none", color: "black" }}><HomeOutlined /></Link>
                 <Search />
                 <ExploreOutlined />
-                <img src={profilePic} className="sidebar--profilePic" />
+                <Link to={"/profile"}><img src={profilePic} className="sidebar--profilePic" /></Link>
             </div>
             <div className="sidebar--menuButton">
                 <MenuOutlined />
