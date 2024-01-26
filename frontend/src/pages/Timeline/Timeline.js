@@ -1,5 +1,5 @@
 import Sidebar from "../../components/Sidebar/Sidebar";
-import FollowingList from "../../components/Sidebar/FollowingList/FollowingList";
+import FollowingList from "../../components/FollowingList/FollowingList";
 import Post from "../../components/Post/Post";
 import "./Timeline.css";
 

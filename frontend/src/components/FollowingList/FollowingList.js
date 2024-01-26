@@ -1,5 +1,5 @@
 import "./FollowingList.css";
-import image from "../../../images/profile_pic.jpg"
+import image from "../../images/profile_pic.jpg";
 
 const FollowingList = () => {
     return (
