@@ -9,13 +9,15 @@ import {
 } from "@mui/icons-material";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CreatePost from "../../components/CreatePost/CreatePost";
+import PostDetails from "../../components/PostDetails/PostDetails";
 import profilePic from "../../images/profile_pic.jpg";
 import "./Profile.css";
 
 const Profile = () => {
-    const [isContent, setIsContent] = useState(false);
+    const [isContent, setIsContent] = useState(true);
     const [isUser, setIsUser] = useState(true);
     const [createPost, setCreatePost] = useState(false);
+    const [openPostDetails, setOpenPostDetails] = useState(false);
 
     return (
         <>
@@ -59,14 +61,39 @@ const Profile = () => {
                         {
                             isContent ? (
                                 <div className="profile--media--content">
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
-                                    <img src={profilePic} style={{ width: "21.3rem" }} />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                        onClick={() => setOpenPostDetails(prev => !prev)}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
+                                    <img
+                                        src={profilePic}
+                                        style={{ width: "21.3rem", cursor: "pointer" }}
+                                    />
                                 </div>
                             ) : (
                                 <div className="profile--media--upload">
@@ -84,7 +111,8 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-            {createPost && <CreatePost />}
+            {createPost && <CreatePost setCreatePost={setCreatePost} />}
+            {openPostDetails && <PostDetails setOpenPostDetails={setOpenPostDetails} />}
         </>
     )
 }
