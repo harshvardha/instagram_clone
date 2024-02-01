@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User.model");
 const Post = require("../models/Post.model");
@@ -83,18 +84,37 @@ const getUsers = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
     try {
         const userId = req.params.userId;
+        console.log(userId);
         if (!userId) {
             throw new CustomError(StatusCodes.UNPROCESSABLE_ENTITY, "Please provide correct userId");
         }
-        const user = await User.findById(userId);
+        const user = await User.findById(new mongoose.Types.ObjectId(userId));
         if (!user) {
             throw new CustomError(StatusCodes.NOT_FOUND, "User not found");
         }
-        const posts = await Post.findOne({ user: userId });
+        const posts = await Post.find({ user: new mongoose.Types.ObjectId(userId) });
         res.status(StatusCodes.OK).json({ user, posts });
     } catch (error) {
         console.log(error);
         next(error);
+    }
+}
+
+const getAccountOwnerInfo = async (req, res, next) => {
+    try {
+        const userId = req.userId;
+        if (!userId) {
+            throw new CustomError(StatusCodes.UNAUTHORIZED, "Please provide correct user id");
+        }
+        const user = await User.findById(new mongoose.Types.ObjectId(userId));
+        if (!user) {
+            throw new CustomError(StatusCodes.NOT_FOUND, "User not found");
+        }
+        const { email, password, _id, ...others } = user._doc
+        res.status(StatusCodes.OK).json({ userInfo: others });
+    } catch (error) {
+        console.log(error);
+        next(error)
     }
 }
 
@@ -170,6 +190,7 @@ module.exports = {
     putUpdateAccountCredentials,
     getUsers,
     getUserById,
+    getAccountOwnerInfo,
     deleteUser,
     putFollowUser,
     putUnFollowUser

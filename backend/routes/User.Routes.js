@@ -8,6 +8,7 @@ const {
     deleteUser,
     getUserById,
     getUsers,
+    getAccountOwnerInfo,
     putFollowUser,
     putUnFollowUser
 } = require("../controllers/User.Controller");
@@ -42,10 +43,13 @@ userRouter.put(
 userRouter.delete("/deleteAccount", verifyAccessToken, deleteUser);
 
 // route for getting user by id
-userRouter.get("/:userId", getUserById);
+userRouter.get("/userById/:userId", getUserById);
 
 // route for getting users by name
 userRouter.get("/search", getUsers);
+
+// route for getting account owner info
+userRouter.get("/accountOwnerInfo", verifyAccessToken, getAccountOwnerInfo);
 
 // route for follow a user
 userRouter.put("/follow/:userId", verifyAccessToken, putFollowUser);

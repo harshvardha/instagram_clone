@@ -5,6 +5,7 @@ const { StatusCodes } = require("http-status-codes");
 require("dotenv").config();
 
 const User = require("../models/User.model");
+const Post = require("../models/Post.model");
 const CustomError = require("../errors/CustomError");
 
 const postRegisterNewUser = async (req, res, next) => {
@@ -52,9 +53,9 @@ const postLoginUser = async (req, res, next) => {
                 id: userExist._id
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "10m" }
+            { expiresIn: "24h" }
         );
-        res.status(StatusCodes.OK).json({ accessToken });
+        res.status(StatusCodes.OK).json({ accessToken, username: userExist.username, id: userExist._id });
     } catch (error) {
         console.log(error);
         next(error);
