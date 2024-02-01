@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
     SettingsOutlined,
@@ -7,17 +7,39 @@ import {
     AssignmentIndOutlined,
     CameraAltOutlined
 } from "@mui/icons-material";
+import { UserContext } from "../../context/UserContext";
+import { userApiRequests } from "../../apiRequests";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CreatePost from "../../components/CreatePost/CreatePost";
 import PostDetails from "../../components/PostDetails/PostDetails";
-import profilePic from "../../images/profile_pic.jpg";
 import "./Profile.css";
 
 const Profile = () => {
-    const [isContent, setIsContent] = useState(true);
-    const [isUser, setIsUser] = useState(true);
     const [createPost, setCreatePost] = useState(false);
     const [openPostDetails, setOpenPostDetails] = useState(false);
+    const [userInfo, setUserInfo] = useState(null);
+    const [userPosts, setUserPosts] = useState(null);
+    const { isOwner, userId } = useContext(UserContext);
+
+    useEffect(() => {
+        const id = isOwner ? localStorage.getItem("accountOwnerId") : userId;
+        console.log(id);
+        const getUserById = async () => {
+            try {
+                const response = await userApiRequests.getUserById(id);
+                if (response.status === 200) {
+                    console.log(response.data);
+                    setUserInfo(response.data.user);
+                    setUserPosts(response.data.posts);
+                } else {
+                    return window.alert("something went wrong.");
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        getUserById();
+    }, [])
 
     return (
         <>
@@ -25,14 +47,15 @@ const Profile = () => {
                 <Sidebar />
                 <div className="profile--page">
                     <div className="profile--page--about">
-                        <img src={profilePic} className="about--profilePic" />
+                        <img src={userInfo?.profilePictureUrl} className="about--profilePic" />
                         <div className="profile--page--about--details">
                             <div className="details--username">
-                                <p>harshvardhan28_04</p>
+                                <p>{userInfo?.username}</p>
                                 {
-                                    isUser ? (
+                                    isOwner ? (
                                         <div className="buttons">
                                             <Link to={"/editProfile"}><button type="button" id="editProfileButton">Edit Profile</button></Link>
+                                            {userPosts?.length > 0 && <button id="create_post_button" type="button" onClick={() => setCreatePost(prev => !prev)}>Create Post</button>}
                                             <button type="button" id="settingButton"><SettingsOutlined /></button>
                                         </div>
                                     ) : (
@@ -43,12 +66,13 @@ const Profile = () => {
                                 }
                             </div>
                             <div className="details--metrics">
-                                <p>0 posts</p>
-                                <p>12 followers</p>
-                                <p>38 following</p>
+                                <p>{userPosts?.length} posts</p>
+                                <p>{userInfo?.followers.length} followers</p>
+                                <p>{userInfo?.following.length} following</p>
                             </div>
                             <div className="details--bio">
-                                <p>Harshvardhan Singh Chauhan</p>
+                                <p>{userInfo?.name}</p>
+                                <p>{userInfo?.bio}</p>
                             </div>
                         </div>
                     </div>
@@ -59,41 +83,17 @@ const Profile = () => {
                             <p style={{ marginTop: "0.625rem" }}><AssignmentIndOutlined style={{ verticalAlign: "top" }} /> TAGGED</p>
                         </div>
                         {
-                            isContent ? (
+                            userPosts?.length > 0 ? (
                                 <div className="profile--media--content">
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                        onClick={() => setOpenPostDetails(prev => !prev)}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
-                                    <img
-                                        src={profilePic}
-                                        style={{ width: "21.3rem", cursor: "pointer" }}
-                                    />
+                                    {
+                                        userPosts?.map(
+                                            post => <img
+                                                src={post.url}
+                                                style={{ width: "21.3rem", cursor: "pointer" }}
+                                                onClick={() => setOpenPostDetails(prev => !prev)}
+                                            />
+                                        )
+                                    }
                                 </div>
                             ) : (
                                 <div className="profile--media--upload">
@@ -111,7 +111,7 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
-            {createPost && <CreatePost setCreatePost={setCreatePost} />}
+            {createPost && <CreatePost setCreatePost={setCreatePost} setUserPosts={setUserPosts} />}
             {openPostDetails && <PostDetails setOpenPostDetails={setOpenPostDetails} />}
         </>
     )

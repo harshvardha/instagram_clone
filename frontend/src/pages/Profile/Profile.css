@@ -32,6 +32,12 @@
     column-gap: 3rem;
 }
 
+.details--bio {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+}
+
 .buttons {
     display: flex;
     align-items: center;
@@ -74,14 +80,14 @@
     align-items: center;
     justify-content: center;
     column-gap: 5rem;
-    padding: 0px 20rem;
+    padding: 0px 19.5rem;
 }
 
 .profile--media--content {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    column-gap: 0.625rem;
-    row-gap: 0.625rem;
+    column-gap: 0.3rem;
+    row-gap: 0.6rem;
     justify-content: center;
     margin-bottom: 1rem;
 }
@@ -115,4 +121,14 @@ input[type="file"] {
     letter-spacing: 2px;
     font-weight: bold;
     padding: 0.3125rem 0.625rem 0.3125rem 0.625rem;
+}
+
+#create_post_button {
+    background-color: #8088E8;
+    color: white;
+    font-family: poppins, sans-serif;
+    padding: 0.5rem 1.25rem;
+    border-radius: 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
 }

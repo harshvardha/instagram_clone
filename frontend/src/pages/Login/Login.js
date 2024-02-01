@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from "../../context/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FacebookOutlined } from "@mui/icons-material";
 import { authenticationApiRequests } from "../../apiRequests";
@@ -7,6 +8,7 @@ import "./Login.css";
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { setIsOwner } = useContext(UserContext);
     const navigateTo = useNavigate();
 
     const submitLogin = async (event) => {
@@ -23,7 +25,9 @@ const Login = () => {
             const response = await authenticationApiRequests.login(loginDetails);
             if (response.status === 200) {
                 localStorage.setItem("accessToken", response.data.accessToken);
-                navigateTo("/profile");
+                localStorage.setItem("accountOwnerId", response.data.id);
+                setIsOwner(true);
+                navigateTo(`/profile/${response.data.username}`);
             }
         } catch (error) {
             console.log(error);

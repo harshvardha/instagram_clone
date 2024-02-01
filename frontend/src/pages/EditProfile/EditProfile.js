@@ -1,80 +1,83 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import app from "../../firebase";
-import { userInfoUpdateApiRequests } from "../../apiRequests";
+import { userApiRequests } from "../../apiRequests";
+import usePreviewImage from "../../hooks/usePreviewImage";
+import useUploadPost from "../../hooks/useUploadPost";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import "./EditProfile.css";
+import { UserContext } from "../../context/UserContext";
 
 const EditProfile = () => {
     const [username, setUsername] = useState("");
     const [fullname, setFullname] = useState("");
     const [gender, setGender] = useState("");
     const [bio, setBio] = useState("");
-    const [uploadPercentage, setUploadPercentage] = useState(0);
-    const [profilePicUrl, setProfilePicUrl] = useState("");
+    const [profilePicUrl, setProfileUrl] = useState("");
+    const { setIsOwner } = useContext(UserContext);
+    const { handleImageChange, imageFile, setImageFile } = usePreviewImage();
+    const { setFile, downloadUrl, uploadPercentage, isUploading, uploadPostImage, setUploadPercentage } = useUploadPost();
     const navigateTo = useNavigate();
 
-    const uploadProfilePic = (file) => {
-        const storage = getStorage(app);
-        const fileName = new Date().getTime() + file.name;
-        const storageRef = ref(storage, fileName);
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadPercentage(Math.round(progress));
-                switch (snapshot.state) {
-                    case "paused":
-                        console.log("Upload is paused");
-                        break;
-                    case "running":
-                        console.log("Upload is running");
-                        break;
-                }
-            },
-            (error) => {
-                console.log(error);
-            },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    setProfilePicUrl(downloadURL);
-                });
-            }
-        )
-    }
-
-    const submitProfileInfo = async () => {
+    const updateProfile = async () => {
         try {
-            const newProfileInfo = {};
+            const newProfileDetails = {};
             if (username) {
-                newProfileInfo["username"] = username;
+                newProfileDetails["username"] = username;
             }
             if (fullname) {
-                newProfileInfo["name"] = fullname;
+                newProfileDetails["name"] = fullname;
             }
             if (gender) {
-                newProfileInfo["gender"] = gender;
+                newProfileDetails["gender"] = gender;
             }
             if (bio) {
-                newProfileInfo["bio"] = bio;
+                newProfileDetails["bio"] = bio;
             }
-            if (profilePicUrl) {
-                newProfileInfo["profilePictureUrl"] = profilePicUrl;
+            if (downloadUrl || profilePicUrl) {
+                newProfileDetails["profilePictureUrl"] = downloadUrl || profilePicUrl;
             }
             const accessToken = localStorage.getItem("accessToken");
-            const response = await userInfoUpdateApiRequests.editProfile(newProfileInfo, accessToken);
+            const response = await userApiRequests.editProfile(newProfileDetails, accessToken);
             if (response.status === 200) {
-                navigateTo("/profile");
-            }
-            else {
-                window.alert("Something went wrong");
+                setIsOwner(true);
+                navigateTo(`/profile/${username}`);
+            } else {
+                window.alert("Something went wrong.");
             }
         } catch (error) {
+            setUploadPercentage(0);
             console.log(error);
         }
     }
+
+    useEffect(() => {
+        if (isUploading === false && uploadPercentage === 100) {
+            console.log("updating profile");
+            updateProfile();
+            setUploadPercentage(0);
+        }
+    }, [isUploading]);
+
+    useEffect(() => {
+        const getAccountOwnerInfo = async () => {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                const response = await userApiRequests.getOwnerAccountInfo(accessToken);
+                if (response.status === 200) {
+                    setUsername(response.data.userInfo.username);
+                    setFullname(response.data.userInfo.name);
+                    setGender(response.data.userInfo.gender);
+                    setBio(response.data.userInfo.bio);
+                    setImageFile(response.data.userInfo.profilePictureUrl);
+                    setProfileUrl(response.data.userInfo.profilePictureUrl);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        setIsOwner(false);
+        getAccountOwnerInfo();
+    }, [])
 
     return (
         <div className="editProfile">
@@ -131,20 +134,28 @@ const EditProfile = () => {
                 <div className="editProfile--inputs">
                     <h2>Profile Pic</h2>
                     <div className="profilePic">
-                        {profilePicUrl ? <img id="newProfilePic" src={profilePicUrl} /> : (uploadPercentage === 0 ? "" : uploadPercentage + "%")}
+                        {imageFile && <img id="newProfilePic" src={imageFile} />}
                         <label id="changePhoto">
                             <input
                                 type="file"
                                 accept="image/*"
                                 onChange={(event) => {
-                                    uploadProfilePic(event.target.files[0])
+                                    setFile(event.target.files[0]);
+                                    setImageFile(null);
+                                    handleImageChange(event);
                                 }}
                             />
                             Change photo
                         </label>
                     </div>
                 </div>
-                <button type="button" onClick={submitProfileInfo} id="submitButton">Submit</button>
+                <button type="button" onClick={() => {
+                    if (imageFile === profilePicUrl) {
+                        updateProfile();
+                    } else {
+                        uploadPostImage()
+                    }
+                }} id="submitButton">Submit</button>
             </div>
         </div>
     )
