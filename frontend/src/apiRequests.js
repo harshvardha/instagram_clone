@@ -10,7 +10,7 @@ export const authenticationApiRequests = {
 }
 
 // api calls for user info update
-export const userInfoUpdateApiRequests = {
+export const userApiRequests = {
     editProfile: (newProfileInfo, accessToken) => {
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         return api.put(`${baseUrl}/user/editProfile`, newProfileInfo);
@@ -24,7 +24,7 @@ export const userInfoUpdateApiRequests = {
         return api.delete(`${baseUrl}/user/deleteAccount`);
     },
     getUserById: (userId) => {
-        return api.get(`${baseUrl}/user/${userId}`);
+        return api.get(`${baseUrl}/user/userById/${userId}`);
     },
     search: (query) => {
         return api.get(`${baseUrl}/user?query=${query}`);
@@ -36,6 +36,10 @@ export const userInfoUpdateApiRequests = {
     unfollowUser: (userId, accessToken) => {
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         return api.put(`${baseUrl}/user/unfollow/${userId}`);
+    },
+    getOwnerAccountInfo: (accessToken) => {
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        return api.get(`${baseUrl}/user/accountOwnerInfo`);
     }
 }
 
