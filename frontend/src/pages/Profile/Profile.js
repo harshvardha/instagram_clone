@@ -12,25 +12,51 @@ import { userApiRequests } from "../../apiRequests";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CreatePost from "../../components/CreatePost/CreatePost";
 import PostDetails from "../../components/PostDetails/PostDetails";
+import blankProfilePic from "../../images/blank-profile-picture.png";
 import "./Profile.css";
 
 const Profile = () => {
     const [createPost, setCreatePost] = useState(false);
     const [openPostDetails, setOpenPostDetails] = useState(false);
+    const [followingUser, setFollowingUser] = useState(false);
+    const [postId, setPostId] = useState();
     const [userInfo, setUserInfo] = useState(null);
     const [userPosts, setUserPosts] = useState(null);
     const { isOwner, userId } = useContext(UserContext);
 
+    const followAndUnfollowUser = async () => {
+        try {
+            const accessToken = localStorage.getItem("accessToken");
+            let response;
+            if (followingUser) {
+                response = await userApiRequests.unfollowUser(userId, accessToken);
+                if (response.status === 200) {
+                    setFollowingUser(false);
+                }
+            } else {
+                response = await userApiRequests.followUser(userId, accessToken);
+                if (response.status === 200) {
+                    setFollowingUser(true);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         const id = isOwner ? localStorage.getItem("accountOwnerId") : userId;
-        console.log(id);
         const getUserById = async () => {
             try {
                 const response = await userApiRequests.getUserById(id);
                 if (response.status === 200) {
-                    console.log(response.data);
                     setUserInfo(response.data.user);
                     setUserPosts(response.data.posts);
+                    const accountOwnerId = localStorage.getItem("accountOwnerId");
+                    const findUser = response.data.user.followers.find(user => user._id === accountOwnerId);
+                    if (findUser) {
+                        setFollowingUser(true);
+                    }
                 } else {
                     return window.alert("something went wrong.");
                 }
@@ -38,8 +64,10 @@ const Profile = () => {
                 console.log(error);
             }
         }
-        getUserById();
-    }, [])
+        if (isOwner || userId) {
+            getUserById();
+        }
+    }, [isOwner, userId])
 
     return (
         <>
@@ -47,7 +75,7 @@ const Profile = () => {
                 <Sidebar />
                 <div className="profile--page">
                     <div className="profile--page--about">
-                        <img src={userInfo?.profilePictureUrl} className="about--profilePic" />
+                        <img src={userInfo?.profilePictureUrl || blankProfilePic} className="about--profilePic" />
                         <div className="profile--page--about--details">
                             <div className="details--username">
                                 <p>{userInfo?.username}</p>
@@ -60,7 +88,11 @@ const Profile = () => {
                                         </div>
                                     ) : (
                                         <div className="buttons">
-                                            <button type="button" id="followUnfollowButton">follow</button>
+                                            <button
+                                                type="button"
+                                                id="followUnfollowButton"
+                                                onClick={followAndUnfollowUser}
+                                            >{followingUser ? "UnFollow" : "Follow"}</button>
                                         </div>
                                     )
                                 }
@@ -90,7 +122,10 @@ const Profile = () => {
                                             post => <img
                                                 src={post.url}
                                                 style={{ width: "21.3rem", cursor: "pointer" }}
-                                                onClick={() => setOpenPostDetails(prev => !prev)}
+                                                onClick={() => {
+                                                    setPostId(post._id);
+                                                    setOpenPostDetails(true)
+                                                }}
                                             />
                                         )
                                     }
@@ -112,7 +147,7 @@ const Profile = () => {
                 </div>
             </div>
             {createPost && <CreatePost setCreatePost={setCreatePost} setUserPosts={setUserPosts} />}
-            {openPostDetails && <PostDetails setOpenPostDetails={setOpenPostDetails} />}
+            {openPostDetails && <PostDetails setOpenPostDetails={setOpenPostDetails} setUserPosts={setUserPosts} postId={postId} />}
         </>
     )
 }

@@ -27,7 +27,7 @@ export const userApiRequests = {
         return api.get(`${baseUrl}/user/userById/${userId}`);
     },
     search: (query) => {
-        return api.get(`${baseUrl}/user?query=${query}`);
+        return api.get(`${baseUrl}/user/search?query=${query}`);
     },
     followUser: (userId, accessToken) => {
         api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;

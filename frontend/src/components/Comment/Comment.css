@@ -26,4 +26,5 @@
     display: flex;
     align-items: center;
     column-gap: 1rem;
+    font-size: 0.75rem;
 }

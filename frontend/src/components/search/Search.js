@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchResult from "../SearchResult/SearchResult";
 import "./Search.css";
+import { userApiRequests } from "../../apiRequests";
 
 const Search = ({ setOpen }) => {
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchResult, setSearchResult] = useState([]);
+
+    useEffect(() => {
+        const search = async () => {
+            try {
+                const response = await userApiRequests.search(searchQuery);
+                if (response.status === 200) {
+                    setSearchResult(response.data.map(
+                        result => <SearchResult
+                            setOpen={setOpen}
+                            searchResult={result}
+                        />
+                    ));
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        if (searchQuery) {
+            search();
+        }
+    }, [searchQuery])
 
     return (
         <div className="search">
@@ -18,23 +41,7 @@ const Search = ({ setOpen }) => {
                 />
             </div>
             <div className="search--results">
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
-                <SearchResult setOpen={setOpen} />
+                {searchResult}
             </div>
         </div>
     )

@@ -4,6 +4,7 @@ import { userApiRequests } from "../../apiRequests";
 import usePreviewImage from "../../hooks/usePreviewImage";
 import useUploadPost from "../../hooks/useUploadPost";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import blankProfilePic from "../../images/blank-profile-picture.png";
 import "./EditProfile.css";
 import { UserContext } from "../../context/UserContext";
 
@@ -134,7 +135,7 @@ const EditProfile = () => {
                 <div className="editProfile--inputs">
                     <h2>Profile Pic</h2>
                     <div className="profilePic">
-                        {imageFile && <img id="newProfilePic" src={imageFile} />}
+                        {imageFile ? <img id="newProfilePic" src={imageFile} /> : <img id="newProfilePic" src={blankProfilePic} />}
                         <label id="changePhoto">
                             <input
                                 type="file"
