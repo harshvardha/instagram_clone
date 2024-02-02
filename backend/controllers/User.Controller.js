@@ -70,7 +70,7 @@ const getUsers = async (req, res, next) => {
         if (!query) {
             throw new CustomError(StatusCodes.UNPROCESSABLE_ENTITY, "Don't provide empty search query.");
         }
-        const foundUsers = await User.find({ name: query });
+        const foundUsers = await User.find({ username: query });
         if (!foundUsers) {
             throw new CustomError(StatusCodes.NOT_FOUND, "Users not found");
         }
@@ -89,10 +89,11 @@ const getUserById = async (req, res, next) => {
             throw new CustomError(StatusCodes.UNPROCESSABLE_ENTITY, "Please provide correct userId");
         }
         const user = await User.findById(new mongoose.Types.ObjectId(userId));
+        await user.populate("followers");
         if (!user) {
             throw new CustomError(StatusCodes.NOT_FOUND, "User not found");
         }
-        const posts = await Post.find({ user: new mongoose.Types.ObjectId(userId) });
+        let posts = await Post.find({ user: new mongoose.Types.ObjectId(userId) });
         res.status(StatusCodes.OK).json({ user, posts });
     } catch (error) {
         console.log(error);
